@@ -1,0 +1,16 @@
+function dCylinder =  CreateLinkPatchObject(dCylinder)
+
+
+faces = dCylinder.faces;
+vertices = dCylinder.vertices;
+linkColor = dCylinder.color;
+patchCylinder = patch('faces', faces, ...
+            'vertices', vertices, ...
+            'facecolor', linkColor, ...
+            'edgecolor', [.75 .75 .75], ...
+            'facealpha', 1.0);
+%            'facealpha', 1.0, ...
+%            'EraseMode', 'normal');
+        
+dCylinder.patch = patchCylinder;
+end
