@@ -1,4 +1,4 @@
-function [qbase, q1, q2, q4] = IK_solver(x, y, z, theta, L1, L2, L4)
+function [qbase, q1, q2, q3] = IK_solver(x, y, z, theta, L1, L2, L4)
     x4 = x
     y4 = y
     z4 = z;
@@ -10,6 +10,8 @@ function [qbase, q1, q2, q4] = IK_solver(x, y, z, theta, L1, L2, L4)
 
     q1 = atan2(y3,x3) + sqrt((L1^2 + x3^2 + y3^2 - L2^2) / (2 * L1 * sqrt(x3^2 + y3^2)));
     q2 = acos((x3^2 + y3^2 - L1^2 - L2^2)/ (2 * L1 * L2));
+    q3 = theta - q1 - q2
     q2 = pi/2-q2
-    q1 = -pi/2q1
-    q4 = theta - q1 - q2;
+    q1 = -pi/2+q1
+    
+    q3 = pi/2 - q3

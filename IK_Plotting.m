@@ -104,13 +104,17 @@ while 1
     %theta1 = -2*(pi)*sin(t(i)); % link 1 motion
     %theta2 = (pi/2)*(1-sin(t(i))); % link 2 motion
     %theta3 = (pi/3)*sin(t(i)); % link 3 motion
-    [qbase, q1, q2, q3] = IK_solver(x, y, z, theta, L1, L2, L4);
+    [qbase, q1, q2, q3] = IK_solver(x, y, z, theta, L1, L2, L4)
     disp("postion currently")
     disp(qbase)
-    disp(q1)
-    disp(q2)
-    disp(q3)
-    disp(q4)
+    %disp(q1)
+    %disp(q2)
+    %disp(q3)
+    %disp(q4)
+    disp(x)
+    disp(y)
+    disp(z)
+    disp(theta)
     
     [T0_base, T1B, T2B, T3B, T4B] = computeTransforms(qbase, q1, q2, q3, q4, L1, L2);
 

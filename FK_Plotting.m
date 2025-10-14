@@ -154,13 +154,13 @@ while 1
     elseif (move == "d")
         q2 = q2 - .1;
     elseif (move == "r")
-        q3 = q3 + .1;
+        q3 = q3 + .1
     elseif (move == "f")
-        q3 = q3 - .1;
+        q3 = q3 - .1
     elseif (move == "t")
-        q4 = q4 + .1;
+        q4 = q4 + .1
     elseif (move == "g")
-        q4 = q4 - .1;
+        q4 = q4 - .1
     end
 
 end
