@@ -7,7 +7,7 @@ clear all; close all; clc
 %------------------------------------------------
 
 %----link parameters
-Lbase = 6; L0 = 0.00; L1 = 6; L2 = 6; L3 = .00; L4 = 4;
+Lbase = 6; L0 = 0.00; L1 = 2; L2 = 2; L3 = .00; L4 = 4;
 % operational point location expressed in frame {4}
 pE_5 = [0; L4; 0]; 
 
@@ -32,7 +32,7 @@ f_handle = 1;
 % axis limits
 axis_limits = [-15 15 0 20 -15 15];
 % camera position
-render_view = [0 1 0];
+render_view = [1 1 1];
 % vertical orientation
 view_up = [0 1 0];
 % initialize rendering view
@@ -55,7 +55,7 @@ d4 =  CreateLinkRendering(L4,r4,sides4,axis4,norm_L4,linkColor4,plotFrame4,f_han
 tEnd = pi; SamplesPerSec = 20;
 t = linspace(0,tEnd,tEnd*SamplesPerSec)';
 qbase = 0;
-q1 = 0;
+ q1 = 0;
 q2 = 0;
 q3 = 0;
 q4 = 0;
@@ -67,7 +67,7 @@ disp(q3)
 disp(q4)
 
 %----set initial position
-[T0_base, T1B, T2B, T3B, T4B] = computeTransforms(qbase, q1, q2, q3, q4, L1, L2);
+[T0_base, T1B, T2B, T3B, T4B] = computeTransforms_New_Arm(qbase, q1, q2, q3, q4, L1, L2);
 
 %calcualte the location of the operation point in frame {0}
 PE_5 = [pE_5; 1];
@@ -88,12 +88,12 @@ UpdateLink(d3,T3B);
 UpdateLink(d4,T4B);
 
 
-x = 10;
-y = 6;
+x = 6;
+y = 2;
 z = pE_B(3);
 disp('Initial End Effector Position:');
 disp(pE_B);
-theta = pi/2;
+theta = 0;
 
 
 
@@ -104,7 +104,7 @@ while 1
     %theta1 = -2*(pi)*sin(t(i)); % link 1 motion
     %theta2 = (pi/2)*(1-sin(t(i))); % link 2 motion
     %theta3 = (pi/3)*sin(t(i)); % link 3 motion
-    [qbase, q1, q2, q3] = IK_solver(x, y, z, theta, L1, L2, L4)
+    [qbase, q1, q2, q3] = IK_New_Arm_solver(x, y, z, theta, L1, L2, L4)
     disp("postion currently")
     disp(qbase)
     %disp(q1)
@@ -112,9 +112,11 @@ while 1
     %disp(q3)
     %disp(q4)
     disp(x)
-    disp
+    disp(y)
+    disp(z)
+    disp(theta)
     
-    [T0_base, T1B, T2B, T3B, T4B] = computeTransforms(qbase, q1, q2, q3, q4, L1, L2);
+    [T0_base, T1B, T2B, T3B, T4B] = computeTransforms_New_(qbase, q1, q2, q3, q4, L1, L2);
 
     %calcualte the location of the operation point in frame {0}
     PE_5 = [pE_5; 1];

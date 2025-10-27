@@ -1,0 +1,185 @@
+
+clear all; close all; clc
+%------------------------------------------------
+% Animation example: Example_3.m
+%   Animate a three-link robot as a function of time
+%   and plot the location of the operational point
+%------------------------------------------------
+
+%----link parameters
+Lbase = 10; L0 = 0.00; L1 = 5; L2 = 2; L3 = 0; L4 = 4;
+% operational point location expressed in frame {4}
+pE_5 = [0; L4; 0]; 
+
+%----rendering parameters
+rbase = .5;  sidesbase = 4; axisbase = 3; norm_Lbase = 1.0;
+    linkColorbase = [.5 0.5 0.5]; plotFramebase = 2 ;
+r0 = 2;  sides0 = 4; axis0 = 2; norm_L0 = -1.0;
+    linkColor0 = [.5 0.5 0.5]; plotFrame0 = 2 ;
+r1 = 2;  sides1 = 4; axis1 = 1; norm_L1 = -1.0;
+    linkColor1 = [1 0 0]; plotFrame1 = 5;
+r2 = 1.5;  sides2 = 4; axis2 = 1; norm_L2 = -1.0;
+    linkColor2 = [0 1 0]; plotFrame2 = 5;
+r3 = 1.0;  sides3 = 8; axis3 = 2; norm_L3 = -1.0;
+    linkColor3 = [0 0 1]; plotFrame3 = 5;
+r4 = 1.0;  sides4 = 8; axis4 = 2; norm_L4 = -1.0;
+    linkColor4 = [0 0 1]; plotFrame4 = 5;
+
+   
+%----set rendering window view parameters
+% figure handle
+f_handle = 1;
+% axis limits
+axis_limits = [-15 15 0 20 -15 15];
+% camera position
+render_view = [1 1 1];
+% vertical orientation
+view_up = [0 1 0];
+% initialize rendering view
+SetRenderingViewParameters(axis_limits,render_view,view_up,f_handle);
+
+%----initialize 3D rendering of robot links:
+% base (doesn't move - created for aesthetic reasons)
+dbase =  CreateLinkRendering(Lbase,rbase,sidesbase,axisbase,norm_Lbase,linkColorbase,plotFramebase,f_handle);
+
+d0 =  CreateLinkRendering(L0,r0,sides0,axis0,norm_L0,linkColor1,plotFrame1,f_handle);
+% link 1
+d1 =  CreateLinkRendering(L1,r1,sides1,axis1,norm_L1,linkColor1,plotFrame1,f_handle);
+% link 2
+d2 =  CreateLinkRendering(L2,r2,sides2,axis2,norm_L2,linkColor2,plotFrame2,f_handle);
+% link 3
+d3 =  CreateLinkRendering(L3,r3,sides3,axis3,norm_L3,linkColor3,plotFrame3,f_handle);
+d4 =  CreateLinkRendering(L4,r4,sides4,axis4,norm_L4,linkColor4,plotFrame4,f_handle);
+
+%----construct the time vector
+tEnd = pi; SamplesPerSec = 20;
+t = linspace(0,tEnd,tEnd*SamplesPerSec)';
+qbase = 0;
+ q1 = 0;
+q2 = 0;
+q3 = 0;
+q4 = 0;
+disp("initial Position:")
+disp(qbase)
+disp(q1)
+disp(q2)
+disp(q3)
+disp(q4)
+
+%----set initial position
+[T0_base, T1B, T2B, T3B, T4B] = computeTransforms_New_Arm(qbase, q1, q2, q3, q4, L1, L2, L4);
+
+%calcualte the location of the operation point in frame {0}
+PE_5 = [pE_5; 1];
+PE_B = T4B*PE_5;
+pE_B = PE_B(1:3,1);
+
+%save the x, y, z value of the operational point for plotting
+%xE_0(i) = pE_B(1);
+%yE_0(i) = pE_B(2);
+%zE_0(i) = pE_B(3);
+
+%update the link rednering            
+figure(f_handle); % set the current figure to the rendering window
+UpdateLink(d0,T0_base);
+UpdateLink(d1,T1B);
+UpdateLink(d2,T2B);
+UpdateLink(d3,T3B);
+UpdateLink(d4,T4B);
+
+
+x = 6;
+y = 2;
+z = pE_B(3);
+disp('Initial End Effector Position:');
+disp(pE_B);
+theta = 0;
+
+
+
+%calcualte the robot kinematics
+while 1
+    
+    % joint displacement at time t(i)
+    %theta1 = -2*(pi)*sin(t(i)); % link 1 motion
+    %theta2 = (pi/2)*(1-sin(t(i))); % link 2 motion
+    %theta3 = (pi/3)*sin(t(i)); % link 3 motion
+    [qbase, q1, q2, q3] = IK_New_Arm_solver(x, y, z, theta, L4)
+    disp("postion currently")
+    disp(qbase)
+    %disp(q1)
+    %disp(q2)
+    %disp(q3)
+    %disp(q4)
+    disp(x)
+    disp(y)
+    disp(z)
+    disp(theta)
+    
+    [T0_base, T1B, T2B, T3B, T4B] = computeTransforms_New_Arm(qbase, q1, q2, q3, q4, L1, L2);
+
+    %calcualte the location of the operation point in frame {0}
+    PE_5 = [pE_5; 1];
+    PE_B = T4B*PE_5;
+    pE_B = PE_B(1:3,1);
+
+    %save the x, y, z value of the operational point for plotting
+    %xE_0(i) = pE_B(1);
+    %yE_0(i) = pE_B(2);
+    %zE_0(i) = pE_B(3);
+
+
+    %update the link rednering            
+    figure(f_handle); % set the current figure to the rendering window
+    UpdateLink(d0,T0_base);
+    UpdateLink(d1,T1B);
+    UpdateLink(d2,T2B);
+    UpdateLink(d3,T3B);
+    UpdateLink(d4,T4B);
+
+    %pause for a moment between time points to slow down the rendering    
+    w = waitforbuttonpress;
+    % Check if a key was pressed
+    if w == 1 
+        % Get the character of the pressed key
+        move = get(gcf, 'CurrentCharacter'); 
+        disp(['You pressed: ', move]);
+    else
+        move = "0";
+        disp('No key was pressed.');
+    end
+    if (move == "q")
+        x = x + .1;
+    elseif (move == "a")
+        x = x - .1;
+    elseif (move == "w")
+        y = y + .1;
+    elseif (move == "s")
+        y = y - .1;
+    elseif (move == "e")
+        z = z + .1;
+    elseif (move == "d")
+        z = z - .1;
+    elseif (move == "r")
+        theta = theta + .1;
+    elseif (move == "f")
+        theta = theta - .1;
+    end
+
+end
+
+%---plot location of the operational point as
+%   a function of time
+% figure
+% 
+% subplot(3,1,1)
+% plot(t,xE_0)
+% xlabel('time'); ylabel('xE'); grid on
+% 
+% subplot(3,1,2)
+% plot(t,yE_0)
+% xlabel('time'); ylabel('yE'); grid on
+% 
+% subplot(3,1,3)
+% plot(t,zE_0)
+% xlabel('time'); ylabel('zE'); grid on
