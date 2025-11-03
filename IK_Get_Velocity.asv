@@ -117,9 +117,6 @@ while 1
     disp(theta)
     
     [T0_base, T1B, T2B, T3B, T4B] = computeTransforms(qbase, q1, q2, q3, q4, L1, L2);
-    
-
-    J = Jacobian_4DOF(T1B, T2B, T3B, T4B);
 
     %calcualte the location of the operation point in frame {0}
     PE_5 = [pE_5; 1];
@@ -169,11 +166,7 @@ while 1
         theta = theta - .1;
     end
 
-
 end
-
-
-
 
 %---plot location of the operational point as
 %   a function of time
