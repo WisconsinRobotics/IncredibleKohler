@@ -15,7 +15,7 @@ function [T0_base, T1B, T2B, T3B, T4B] = computeTransforms(q_rail, theta1, theta
     s = sin(theta2); c = cos(theta2);
     T21 = [s  c  0 -L2*s
           -c  s  0  L2*c
-           0  0  1  0 
+           0  0  1  0.01 
            0  0  0  1];
     
 

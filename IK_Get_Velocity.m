@@ -11,6 +11,15 @@ Lbase = 6; L0 = 0.00; L1 = 6; L2 = 6; L3 = .00; L4 = 4;
 % operational point location expressed in frame {4}
 pE_5 = [0; L4; 0]; 
 
+%end effectof velocities
+x_speed = 0;
+y_speed = 0;
+z_speed = 0;
+wz = 0;
+
+%joint-velocity
+q_dot = [0;0;0;0];
+
 %----rendering parameters
 rbase = .5;  sidesbase = 4; axisbase = 3; norm_Lbase = 1.0;
     linkColorbase = [.5 0.5 0.5]; plotFramebase = 2 ;
@@ -104,19 +113,18 @@ while 1
     %theta1 = -2*(pi)*sin(t(i)); % link 1 motion
     %theta2 = (pi/2)*(1-sin(t(i))); % link 2 motion
     %theta3 = (pi/3)*sin(t(i)); % link 3 motion
-    [qbase, q1, q2, q3] = IK_solver(x, y, z, theta, L1, L2, L4)
-    disp("postion currently")
-    disp(qbase)
-    %disp(q1)
+    [qbase, q1, q2, q3] = IK_solver(x, y, z, theta, L1, L2, L4);
+
     %disp(q2)
     %disp(q3)
     %disp(q4)
-    disp(x)
-    disp(y)
-    disp(z)
-    disp(theta)
     
-    [T0_base, T1B, T2B, T3B, T4B] = computeTransforms(qbase, q1, q2, q3, q4, L1, L2);
+    [T0_base, T1B, T2B, T3B, T4B] = computeTransforms(qbase, q1, q2, q3, q4, L1, L2)
+    [J, Jv, Jw] = Jacobian_4DOF(T1B,T2B,T3B, T4B)
+    J_planar = [J(1:2,:); J(6,:)];   % vx, vy, wz only
+    x_dot = [x_speed; y_speed; wz];   % only 3 components
+    q_dot = pinv(J_planar) * x_dot
+    %q_dot = pinv(J)*[x_speed;y_speed;z_speed;0;0;wz]
 
     %calcualte the location of the operation point in frame {0}
     PE_5 = [pE_5; 1];
@@ -137,6 +145,8 @@ while 1
     UpdateLink(d3,T3B);
     UpdateLink(d4,T4B);
 
+
+
     %pause for a moment between time points to slow down the rendering    
     w = waitforbuttonpress;
     % Check if a key was pressed
@@ -150,22 +160,54 @@ while 1
     end
     if (move == "q")
         x = x + .1;
+        x_speed = .1;
+        y_speed = 0;
+        wz = 0;
     elseif (move == "a")
         x = x - .1;
+        x_speed = -.1;
+        y_speed = 0;
+        wz = 0;
     elseif (move == "w")
         y = y + .1;
+        y_speed = .1;
+        x_speed = 0;
+        wz = 0;
     elseif (move == "s")
         y = y - .1;
+        y_speed = -.1;
+        x_speed = 0;
+        wz = 0;
     elseif (move == "e")
         z = z + .1;
+        z_speed = .1;
+        x_speed = 0;
+        y_speed = 0;
+        wz = 0;
     elseif (move == "d")
         z = z - .1;
+        z_speed = -.1;
+        x_speed = 0;
+        y_speed = 0;
+        wz = 0;
     elseif (move == "r")
         theta = theta + .1;
+        wz = .1;
+        x_speed = 0;
+        y_speed = 0;
+        z_speed = 0;
     elseif (move == "f")
         theta = theta - .1;
+        wz = -.1;
+        x_speed = 0;
+        y_speed = 0;
+        z_speed = 0;
+    else
+        wz = 0;
+        x_speed = 0;
+        y_speed = 0;
+        z_speed = 0;
     end
-
 end
 
 %---plot location of the operational point as
